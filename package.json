@@ -13,9 +13,12 @@
     "build": "rimraf dist && webpack && mv dist/*.eot dist/static/css/ && mv dist/*.woff* dist/static/css/ && mv dist/*.svg dist/static/css/ && mv dist/*.ttf dist/static/css/",
     "reinstall": "npm i rimraf && rimraf node_modules && npm uninstall -g elm && npm i -g elm && npm i && elm package install"
   },
+  "dependencies": {
+    "font-awesome": "^4.7.0"
+  },
   "devDependencies": {
     "autoprefixer": "^6.3.6",
-    "bootstrap-sass": "^3.3.6",
+    "bulma": "^0.4.3",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.26.1",
     "elm": "^0.18.0",

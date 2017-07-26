@@ -12,14 +12,14 @@ console.log( 'WEBPACK GO!');
 
 // determine build env
 var TARGET_ENV = process.env.npm_lifecycle_event === 'build' ? 'production' : 'development';
-var outputFilename = TARGET_ENV === 'production' ? '[name]-[hash].js' : '[name].js'
+var outputFilename = TARGET_ENV === 'production' ? '[name]-[hash].js' : '[name].js';
 
 // common webpack config
 var commonConfig = {
 
   output: {
     path:       outputPath,
-    filename: `/static/js/${outputFilename}`,
+    filename: `/static/js/${outputFilename}`
     // publicPath: '/'
   },
 
@@ -31,7 +31,13 @@ var commonConfig = {
     noParse: /\.elm$/,
     loaders: [
       {
-        test: /\.(eot|ttf|woff|woff2|svg)$/,
+        test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        // Limiting the size of the woff fonts breaks font-awesome ONLY for the extract text plugin
+        // loader: "url?limit=10000"
+        loader: "url-loader"
+      },
+      {
+        test: /\.(ttf|eot|svg|woff|woff2)(\?[\s\S]+)?$/,
         loader: 'file-loader'
       }
     ]
@@ -45,9 +51,8 @@ var commonConfig = {
     })
   ],
 
-  postcss: [ autoprefixer( { browsers: ['last 2 versions'] } ) ],
-
-}
+  postcss: [ autoprefixer( { browsers: ['last 2 versions'] } ) ]
+};
 
 // additional webpack settings for local env (when invoked by 'npm start')
 if ( TARGET_ENV === 'development' ) {
@@ -63,7 +68,7 @@ if ( TARGET_ENV === 'development' ) {
     devServer: {
       // serve index.html in place of 404 responses
       historyApiFallback: true,
-      contentBase: './src',
+      contentBase: './src'
     },
 
     module: {
@@ -74,7 +79,7 @@ if ( TARGET_ENV === 'development' ) {
           loader:  'elm-hot!elm-webpack?verbose=true&warn=true&debug=true'
         },
         {
-          test: /\.(css|scss)$/,
+          test: /\.(css|sass)$/,
           loaders: [
             'style-loader',
             'css-loader',
@@ -104,7 +109,7 @@ if ( TARGET_ENV === 'production' ) {
           loader:  'elm-webpack'
         },
         {
-          test: /\.(css|scss)$/,
+          test: /\.(css|sass)$/,
           loader: ExtractTextPlugin.extract( 'style-loader', [
             'css-loader',
             'postcss-loader',
