@@ -35,7 +35,7 @@ update msg model =
         AddHeritor value ->
             case heritorFromString <| valueWithDefault value "" of
                 Just heritor ->
-                    { model | heritors = model.heritors ++ [ heritor ] }
+                    { model | heritors = model.heritors ++ [ { heritor = heritor, count = 1 } ] }
 
                 Nothing ->
                     model
@@ -46,6 +46,43 @@ update msg model =
                     List.filter ((/=) heritor) model.heritors
             in
                 { model | heritors = heritors }
+
+        IncrementHeritor state ->
+            changeCountFor state (incrementCount <| availableCountFor state) model
+
+        DecrementHeritor state ->
+            changeCountFor state decrementCount model
+
+
+changeCountFor : HeritorState -> (Int -> Int) -> Model -> Model
+changeCountFor { heritor, count } changeCount model =
+    let
+        incrementState state =
+            if state.heritor == heritor then
+                { state | count = changeCount state.count }
+            else
+                state
+
+        heritors =
+            List.map incrementState model.heritors
+    in
+        { model | heritors = heritors }
+
+
+incrementCount : Int -> Int -> Int
+incrementCount availableCount currentCount =
+    if currentCount >= availableCount then
+        availableCount
+    else
+        currentCount + 1
+
+
+decrementCount : Int -> Int
+decrementCount currentCount =
+    if currentCount <= 1 then
+        1
+    else
+        currentCount - 1
 
 
 valueWithDefault : Maybe a -> a -> a
@@ -81,12 +118,34 @@ heritorsView model =
     div [] <| List.map heritorView model.heritors
 
 
-heritorView : Heritor -> Html Msg
-heritorView heritor =
+heritorView : HeritorState -> Html Msg
+heritorView heritorState =
     div []
-        [ i [ class "fa fa-times", onClick <| RemoveHeritor heritor ] []
-        , text <| heritorToString heritor
+        [ i [ class "fa fa-times", onClick <| RemoveHeritor heritorState ] []
+        , counter heritorState
+        , text <| heritorToString heritorState.heritor
         ]
+
+
+counter : HeritorState -> Html Msg
+counter heritorState =
+    let
+        { heritor, count } =
+            heritorState
+    in
+        div []
+            [ i [ class "fa fa-plus", onClick <| IncrementHeritor heritorState ] []
+            , text <| toString count
+            , i [ class "fa fa-minus", onClick <| DecrementHeritor heritorState ] []
+            ]
+
+
+availableCountFor : HeritorState -> Int
+availableCountFor heritorState =
+    List.filter (.heritor >> (==) heritorState.heritor) heritors
+        |> List.head
+        |> flip valueWithDefault heritorState
+        |> .count
 
 
 addHeritorSelect : Model -> Html Msg
@@ -104,6 +163,10 @@ heritorOption heritor =
     option [ value heritor ] [ text heritor ]
 
 
-unselectedHeritors : Model -> List { heritor : Heritor, count : Int }
+unselectedHeritors : Model -> List HeritorState
 unselectedHeritors model =
-    List.filter (.heritor >> flip List.member model.heritors >> not) heritors
+    let
+        selectedHeritors =
+            List.map .heritor model.heritors
+    in
+        List.filter (.heritor >> flip List.member selectedHeritors >> not) heritors

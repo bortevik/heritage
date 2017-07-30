@@ -3,11 +3,19 @@ module Types exposing (..)
 
 type Msg
     = AddHeritor (Maybe String)
-    | RemoveHeritor Heritor
+    | RemoveHeritor HeritorState
+    | IncrementHeritor HeritorState
+    | DecrementHeritor HeritorState
 
 
 type alias Model =
-    { heritors : List Heritor }
+    { heritors : List HeritorState }
+
+
+type alias HeritorState =
+    { heritor : Heritor
+    , count : Int
+    }
 
 
 type Heritor
@@ -37,7 +45,7 @@ type Heritor
     | AuntByMother
 
 
-heritors : List { heritor : Heritor, count : Int }
+heritors : List HeritorState
 heritors =
     [ { heritor = Father, count = 1 }
     , { heritor = GrandFather, count = 1 }
