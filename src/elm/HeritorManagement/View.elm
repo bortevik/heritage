@@ -10,7 +10,7 @@ import Json.Decode
 
 view : Model -> Html Msg
 view model =
-    div [ class "box heritors-list" ]
+    div [ class "heritors-list" ]
         [ heritorsView model
         , heritorSelect model
         ]

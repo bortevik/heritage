@@ -6,6 +6,7 @@ type Msg
     | RemoveHeritor HeritorState
     | IncrementHeritor HeritorState
     | DecrementHeritor HeritorState
+    | CalculateHeritage
 
 
 type alias Model =

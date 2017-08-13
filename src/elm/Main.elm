@@ -1,8 +1,9 @@
 module Main exposing (..)
 
 import Types exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, text, button, h1, section)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import HeritorManagement.View
 import HeritorManagement.State
 
@@ -51,6 +52,9 @@ update msg model =
         DecrementHeritor state ->
             HeritorManagement.State.decrementHeritor model state
 
+        CalculateHeritage ->
+            model
+
 
 
 -- VIEW
@@ -62,6 +66,9 @@ view model =
         [ div [ class "container" ]
             [ div [ class "box" ]
                 [ h1 [ class "title has-text-centered" ] [ text "حساب الميراث" ] ]
-            , HeritorManagement.View.view model
+            , div [ class "box" ]
+                [ HeritorManagement.View.view model
+                , div [] [ button [ class "button is-info", onClick CalculateHeritage ] [ text "احسب" ] ]
+                ]
             ]
         ]
