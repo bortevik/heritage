@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Events.Extra exposing (targetValueMaybe)
 import Json.Decode
+import HeritorManagement.State exposing (..)
 
 
 view : Model -> Html Msg
@@ -37,10 +38,40 @@ counter heritorState =
             heritorState
     in
         div [ class "counter" ]
-            [ i [ class "decrement-icon fa fa-minus", onClick <| DecrementHeritor heritorState ] []
+            [ decrementButton heritorState
             , span [ class "heritor-count" ] [ text <| toString count ]
-            , i [ class "increment-icon fa fa-plus", onClick <| IncrementHeritor heritorState ] []
+            , incrementButton heritorState
             ]
+
+
+decrementButton : HeritorState -> Html Msg
+decrementButton heritorState =
+    let
+        disabled =
+            if heritorState.count <= 1 then
+                " disabled"
+            else
+                ""
+
+        classNames =
+            "decrement-icon fa fa-minus" ++ disabled
+    in
+        i [ class classNames, onClick <| DecrementHeritor heritorState ] []
+
+
+incrementButton : HeritorState -> Html Msg
+incrementButton heritorState =
+    let
+        disabled =
+            if heritorState.count >= availableCountFor heritorState then
+                " disabled"
+            else
+                ""
+
+        classNames =
+            "increment-icon fa fa-plus" ++ disabled
+    in
+        i [ class classNames, onClick <| IncrementHeritor heritorState ] []
 
 
 addHeritorSelect : Model -> Html Msg

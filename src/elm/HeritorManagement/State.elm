@@ -4,6 +4,7 @@ module HeritorManagement.State
         , removeHeritor
         , incrementHeritor
         , decrementHeritor
+        , availableCountFor
         )
 
 import Types exposing (..)
