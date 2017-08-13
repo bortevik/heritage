@@ -21,7 +21,15 @@ main =
 
 model : Model
 model =
-    { heritors = [] }
+    let
+        newHeritorState ( heritor, availableCount ) =
+            HeritorState heritor 0 Unselected availableCount
+
+        heritorStates =
+            List.map newHeritorState heritorsAvailabeCounts
+    in
+        { heritors = heritorStates
+        }
 
 
 
@@ -31,8 +39,8 @@ model =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AddHeritor value ->
-            HeritorManagement.State.addHeritor model value
+        SelectHeritor value ->
+            HeritorManagement.State.selectHeritor model value
 
         RemoveHeritor heritor ->
             HeritorManagement.State.removeHeritor model heritor

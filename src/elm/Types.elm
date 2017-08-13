@@ -2,7 +2,7 @@ module Types exposing (..)
 
 
 type Msg
-    = AddHeritor (Maybe String)
+    = SelectHeritor (Maybe String)
     | RemoveHeritor HeritorState
     | IncrementHeritor HeritorState
     | DecrementHeritor HeritorState
@@ -15,7 +15,14 @@ type alias Model =
 type alias HeritorState =
     { heritor : Heritor
     , count : Int
+    , selected : HeritorSelectionState
+    , availableCount : Int
     }
+
+
+type HeritorSelectionState
+    = Selected
+    | Unselected
 
 
 type Heritor
@@ -45,32 +52,32 @@ type Heritor
     | AuntByMother
 
 
-heritors : List HeritorState
-heritors =
-    [ { heritor = Father, count = 1 }
-    , { heritor = GrandFather, count = 1 }
-    , { heritor = GrandGrandFather, count = 1 }
-    , { heritor = Mother, count = 1 }
-    , { heritor = GrandMother, count = 1 }
-    , { heritor = GrandGrandMother, count = 1 }
-    , { heritor = Son, count = 100 }
-    , { heritor = GrandSon, count = 1000 }
-    , { heritor = CrandGrandSon, count = 10000 }
-    , { heritor = Daughter, count = 100 }
-    , { heritor = GrandDaughter, count = 1000 }
-    , { heritor = GrandGrandDaughter, count = 10000 }
-    , { heritor = Wife, count = 4 }
-    , { heritor = Husband, count = 1 }
-    , { heritor = FullBrother, count = 20 }
-    , { heritor = BrotherByFather, count = 20 }
-    , { heritor = BrotherByMother, count = 20 }
-    , { heritor = FullSister, count = 20 }
-    , { heritor = SisterByFather, count = 20 }
-    , { heritor = SisterByMother, count = 20 }
-    , { heritor = UncleByFather, count = 20 }
-    , { heritor = UncleByMother, count = 20 }
-    , { heritor = AuntByFather, count = 20 }
-    , { heritor = AuntByMother, count = 20 }
+heritorsAvailabeCounts : List ( Heritor, Int )
+heritorsAvailabeCounts =
+    [ ( Father, 1 )
+    , ( GrandFather, 1 )
+    , ( GrandGrandFather, 1 )
+    , ( Mother, 1 )
+    , ( GrandMother, 1 )
+    , ( GrandGrandMother, 1 )
+    , ( Son, 100 )
+    , ( GrandSon, 1000 )
+    , ( CrandGrandSon, 1000 )
+    , ( Daughter, 100 )
+    , ( GrandDaughter, 1000 )
+    , ( GrandGrandDaughter, 1000 )
+    , ( Wife, 4 )
+    , ( Husband, 1 )
+    , ( FullBrother, 20 )
+    , ( BrotherByFather, 20 )
+    , ( BrotherByMother, 20 )
+    , ( FullSister, 20 )
+    , ( SisterByFather, 20 )
+    , ( SisterByMother, 20 )
+    , ( UncleByFather, 20 )
+    , ( UncleByMother, 20 )
+    , ( AuntByFather, 20 )
+    , ( AuntByMother, 20 )
     ]
 
 

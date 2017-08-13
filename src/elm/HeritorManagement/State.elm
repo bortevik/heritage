@@ -1,21 +1,30 @@
 module HeritorManagement.State
     exposing
-        ( addHeritor
+        ( selectHeritor
         , removeHeritor
         , incrementHeritor
         , decrementHeritor
-        , availableCountFor
         )
 
 import Types exposing (..)
 import Utils exposing (valueWithDefault)
 
 
-addHeritor : Model -> Maybe String -> Model
-addHeritor model maybeHeritorString =
+selectHeritor : Model -> Maybe String -> Model
+selectHeritor model maybeHeritorString =
     case heritorFromString <| valueWithDefault maybeHeritorString "" of
         Just heritor ->
-            { model | heritors = model.heritors ++ [ { heritor = heritor, count = 1 } ] }
+            let
+                selectHeritor state =
+                    if state.heritor == heritor then
+                        { state | selected = Selected }
+                    else
+                        state
+
+                heritors =
+                    List.map selectHeritor model.heritors
+            in
+                { model | heritors = heritors }
 
         Nothing ->
             model
@@ -42,7 +51,7 @@ setHeritorsCount model value =
 
 incrementHeritor : Model -> HeritorState -> Model
 incrementHeritor model state =
-    changeCountFor state (incrementCount <| availableCountFor state) model
+    changeCountFor state (incrementCount state.availableCount) model
 
 
 decrementHeritor : Model -> HeritorState -> Model
@@ -79,11 +88,3 @@ decrementCount currentCount =
         1
     else
         currentCount - 1
-
-
-availableCountFor : HeritorState -> Int
-availableCountFor heritorState =
-    List.filter (.heritor >> (==) heritorState.heritor) heritors
-        |> List.head
-        |> flip valueWithDefault heritorState
-        |> .count

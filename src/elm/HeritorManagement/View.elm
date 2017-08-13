@@ -6,20 +6,23 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Events.Extra exposing (targetValueMaybe)
 import Json.Decode
-import HeritorManagement.State exposing (..)
 
 
 view : Model -> Html Msg
 view model =
     div [ class "box heritors-list" ]
         [ heritorsView model
-        , addHeritorSelect model
+        , heritorSelect model
         ]
 
 
 heritorsView : Model -> Html Msg
 heritorsView model =
-    div [] <| List.map heritorView model.heritors
+    let
+        selectedHeritors =
+            List.filter (.selected >> (==) Selected) model.heritors
+    in
+      div [] <| List.map heritorView selectedHeritors
 
 
 heritorView : HeritorState -> Html Msg
@@ -45,10 +48,10 @@ counter heritorState =
 
 
 decrementButton : HeritorState -> Html Msg
-decrementButton heritorState =
+decrementButton state =
     let
         disabled =
-            if heritorState.count <= 1 then
+            if state.count <= 1 then
                 " disabled"
             else
                 ""
@@ -56,14 +59,14 @@ decrementButton heritorState =
         classNames =
             "decrement-icon fa fa-minus" ++ disabled
     in
-        i [ class classNames, onClick <| DecrementHeritor heritorState ] []
+        i [ class classNames, onClick <| DecrementHeritor state ] []
 
 
 incrementButton : HeritorState -> Html Msg
-incrementButton heritorState =
+incrementButton state =
     let
         disabled =
-            if heritorState.count >= availableCountFor heritorState then
+            if state.count >= state.availableCount then
                 " disabled"
             else
                 ""
@@ -71,17 +74,17 @@ incrementButton heritorState =
         classNames =
             "increment-icon fa fa-plus" ++ disabled
     in
-        i [ class classNames, onClick <| IncrementHeritor heritorState ] []
+        i [ class classNames, onClick <| IncrementHeritor state ] []
 
 
-addHeritorSelect : Model -> Html Msg
-addHeritorSelect model =
+heritorSelect : Model -> Html Msg
+heritorSelect model =
     let
         heritorOptions =
             option [ value "", disabled True, selected True ] [ text "اختر وارثا" ]
                 :: List.map (.heritor >> heritorToString >> heritorOption) (unselectedHeritors model)
     in
-        select [ on "change" (Json.Decode.map AddHeritor targetValueMaybe) ] heritorOptions
+        select [ on "change" (Json.Decode.map SelectHeritor targetValueMaybe) ] heritorOptions
 
 
 heritorOption : String -> Html Msg
@@ -91,8 +94,4 @@ heritorOption heritor =
 
 unselectedHeritors : Model -> List HeritorState
 unselectedHeritors model =
-    let
-        selectedHeritors =
-            List.map .heritor model.heritors
-    in
-        List.filter (.heritor >> flip List.member selectedHeritors >> not) heritors
+    List.filter (.selected >> ( == ) Unselected) model.heritors
