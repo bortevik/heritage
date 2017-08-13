@@ -1,19 +1,40 @@
 @import '~bulma/bulma'
 
+$danger-color: #ff3860
+$light-grey: #d3d3d3
+
 .heritors-list
   .heritor-row
+    align-items: center
     display: flex
     flex-direction: row-reverse
+    font-size: 1.2rem;
 
     .heritor-label
       display: inline-block
       width: 100px
 
-.counter
-  align-items: center
-  display: flex
-  justify-content: space-between
+    .counter
+      align-items: center
+      display: flex
+      justify-content: center
+      width: 10rem
 
-  .heritor-count
-    width: 5rem
-    text-align: right
+      .heritor-count
+        margin: 0 .5rem
+        text-align: right
+
+      .decrement-icon,
+      .increment-icon
+        font-size: .6em
+
+        &.disabled
+          color: $light-grey
+
+    .remove-icon,
+    .decrement-icon,
+    .increment-icon
+      cursor: pointer
+
+    .remove-icon
+      color: $danger-color

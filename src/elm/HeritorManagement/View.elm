@@ -37,9 +37,9 @@ counter heritorState =
             heritorState
     in
         div [ class "counter" ]
-            [ i [ class "increment-icon fa fa-plus", onClick <| IncrementHeritor heritorState ] []
+            [ i [ class "decrement-icon fa fa-minus", onClick <| DecrementHeritor heritorState ] []
             , span [ class "heritor-count" ] [ text <| toString count ]
-            , i [ class "decrement-icon fa fa-minus", onClick <| DecrementHeritor heritorState ] []
+            , i [ class "increment-icon fa fa-plus", onClick <| IncrementHeritor heritorState ] []
             ]
 
 
