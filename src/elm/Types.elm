@@ -10,7 +10,9 @@ type Msg
 
 
 type alias Model =
-    { heritors : List HeritorState }
+    { heritors : List HeritorState
+    , calculationResults : List HeritageCalculationResult
+    }
 
 
 type alias HeritorState =
@@ -26,19 +28,21 @@ type HeritorSelectionState
     | Unselected
 
 
+type alias HeritageCalculationResult =
+    { heritor : Heritor
+    , share : ShareOfHeritage
+    }
+
+
+type alias ShareOfHeritage =
+    ( Int, Int )
+
+
 type Heritor
     = Father
-    | GrandFather
-    | GrandGrandFather
     | Mother
-    | GrandMother
-    | GrandGrandMother
     | Son
-    | GrandSon
-    | CrandGrandSon
     | Daughter
-    | GrandDaughter
-    | GrandGrandDaughter
     | Wife
     | Husband
     | FullBrother
@@ -56,17 +60,9 @@ type Heritor
 heritorsAvailabeCounts : List ( Heritor, Int )
 heritorsAvailabeCounts =
     [ ( Father, 1 )
-    , ( GrandFather, 1 )
-    , ( GrandGrandFather, 1 )
     , ( Mother, 1 )
-    , ( GrandMother, 1 )
-    , ( GrandGrandMother, 1 )
     , ( Son, 100 )
-    , ( GrandSon, 1000 )
-    , ( CrandGrandSon, 1000 )
     , ( Daughter, 100 )
-    , ( GrandDaughter, 1000 )
-    , ( GrandGrandDaughter, 1000 )
     , ( Wife, 4 )
     , ( Husband, 1 )
     , ( FullBrother, 20 )
@@ -88,38 +84,14 @@ heritorToString heritor =
         Father ->
             "أب"
 
-        GrandFather ->
-            "أب الأب"
-
-        GrandGrandFather ->
-            "أب الأب الأب"
-
         Mother ->
             "أم"
-
-        GrandMother ->
-            "أم الأب"
-
-        GrandGrandMother ->
-            "أم الأب الأب"
 
         Son ->
             "ابن"
 
-        GrandSon ->
-            "ابن لابن"
-
-        CrandGrandSon ->
-            "ابن لابن لابن"
-
         Daughter ->
             "بنت"
-
-        GrandDaughter ->
-            "بنت لابن"
-
-        GrandGrandDaughter ->
-            "بنت لابن لابن"
 
         Wife ->
             "زوجة"
@@ -164,38 +136,14 @@ heritorFromString heritor =
         "أب" ->
             Just Father
 
-        "أب الأب" ->
-            Just GrandFather
-
-        "أب الأب الأب" ->
-            Just GrandGrandFather
-
         "أم" ->
             Just Mother
-
-        "أم الأب" ->
-            Just GrandMother
-
-        "أم الأب الأب" ->
-            Just GrandGrandMother
 
         "ابن" ->
             Just Son
 
-        "ابن لابن" ->
-            Just GrandSon
-
-        "ابن لابن لابن" ->
-            Just CrandGrandSon
-
         "بنت" ->
             Just Daughter
-
-        "بنت لابن" ->
-            Just GrandDaughter
-
-        "بنت لابن لابن" ->
-            Just GrandGrandDaughter
 
         "زوجة" ->
             Just Wife

@@ -6,6 +6,8 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import HeritorManagement.View
 import HeritorManagement.State
+import HeritageCalculation.State
+import HeritageCalculation.View
 
 
 -- APP
@@ -30,6 +32,7 @@ model =
             List.map newHeritorState heritorsAvailabeCounts
     in
         { heritors = heritorStates
+        , calculationResults = []
         }
 
 
@@ -53,7 +56,7 @@ update msg model =
             HeritorManagement.State.decrementHeritor model state
 
         CalculateHeritage ->
-            model
+            HeritageCalculation.State.calculateHeritage model
 
 
 
@@ -69,6 +72,7 @@ view model =
             , div [ class "box" ]
                 [ HeritorManagement.View.view model
                 , div [] [ button [ class "button is-info", onClick CalculateHeritage ] [ text "احسب" ] ]
+                , HeritageCalculation.View.view model
                 ]
             ]
         ]
