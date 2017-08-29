@@ -1,5 +1,7 @@
 module Types exposing (..)
 
+import Utils.Fraction exposing (Fraction)
+
 
 type Msg
     = SelectHeritor (Maybe String)
@@ -35,7 +37,7 @@ type alias HeritageCalculationResult =
 
 
 type alias ShareOfHeritage =
-    ( Int, Int )
+    Fraction
 
 
 type Heritor
