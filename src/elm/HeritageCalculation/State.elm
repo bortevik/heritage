@@ -14,54 +14,82 @@ half =
     ( 1, 2 )
 
 
-onForth : Fraction
-onForth =
+oneForth : Fraction
+oneForth =
     ( 1, 4 )
+
+
+oneEight : Fraction
+oneEight =
+    ( 1, 8 )
 
 
 calculateHeritage : Model -> Model
 calculateHeritage model =
     ( model, whole )
-        |> husbandHeritage
-        |> sonsHeritage
+        |> ifSelectedCalculate Husband husbandHeritage
+        |> ifSelectedCalculate Wife wifesHeritage
+        |> ifSelectedCalculate Son sonsHeritage
         |> Tuple.first
+
+
+ifSelectedCalculate :
+    Heritor
+    -> (( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage ))
+    -> ( Model, ShareOfHeritage )
+    -> ( Model, ShareOfHeritage )
+ifSelectedCalculate heritor calculate ( model, availableShare ) =
+    case selectedHeritor heritor model.heritors of
+        [] ->
+            ( model, availableShare )
+
+        _ :: _ ->
+            calculate ( model, availableShare )
 
 
 husbandHeritage : ( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage )
 husbandHeritage ( model, availableShare ) =
-    case selectedHeritor Husband model.heritors of
-        [] ->
-            ( model, availableShare )
+    let
+        share =
+            if isChildrenExist model.heritors then
+                oneForth
+            else
+                half
 
-        _ :: _ ->
-            let
-                share =
-                    if isChildrenExist model.heritors then
-                        onForth
-                    else
-                        half
+        calculationResults =
+            model.calculationResults ++ [ { heritor = Husband, share = share } ]
 
-                calculationResults =
-                    model.calculationResults ++ [ { heritor = Son, share = share } ]
+        restOfShare =
+            Fraction.subtract availableShare share
+    in
+        ( { model | calculationResults = calculationResults }, restOfShare )
 
-                restOfShare =
-                    Fraction.subtract availableShare share
-            in
-                ( { model | calculationResults = calculationResults }, restOfShare )
+
+wifesHeritage : ( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage )
+wifesHeritage ( model, availableShare ) =
+    let
+        share =
+            if isChildrenExist model.heritors then
+                oneEight
+            else
+                oneForth
+
+        calculationResults =
+            model.calculationResults ++ [ { heritor = Wife, share = share } ]
+
+        restOfShare =
+            Fraction.subtract availableShare share
+    in
+        ( { model | calculationResults = calculationResults }, restOfShare )
 
 
 sonsHeritage : ( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage )
 sonsHeritage ( model, availableShare ) =
-    case selectedHeritor Son model.heritors of
-        [] ->
-            ( model, availableShare )
-
-        _ :: _ ->
-            let
-                calculationResults =
-                    model.calculationResults ++ [ { heritor = Son, share = availableShare } ]
-            in
-                ( { model | calculationResults = calculationResults }, ( 0, 0 ) )
+    let
+        calculationResults =
+            model.calculationResults ++ [ { heritor = Son, share = availableShare } ]
+    in
+        ( { model | calculationResults = calculationResults }, ( 0, 0 ) )
 
 
 selectedHeritor : Heritor -> List HeritorState -> List HeritorState
