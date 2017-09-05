@@ -105,7 +105,7 @@ isChildrenExist : List HeritorState -> Bool
 isChildrenExist heritors =
     let
         sonOrDaughter state =
-            state.selected == Selected && (state.heritor == Son || state.heritor == Daughter)
+            state.selected == Selected && List.member state.heritor [ Son, Daughter ]
 
         children =
             List.filter sonOrDaughter heritors
