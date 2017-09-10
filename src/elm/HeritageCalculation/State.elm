@@ -14,9 +14,19 @@ half =
     ( 1, 2 )
 
 
+oneThird : Fraction
+oneThird =
+    ( 1, 3 )
+
+
 oneForth : Fraction
 oneForth =
     ( 1, 4 )
+
+
+oneSixth : Fraction
+oneSixth =
+    ( 1, 6 )
 
 
 oneEight : Fraction
@@ -26,70 +36,104 @@ oneEight =
 
 calculateHeritage : Model -> Model
 calculateHeritage model =
-    ( model, whole )
+    model
         |> ifSelectedCalculate Husband husbandHeritage
         |> ifSelectedCalculate Wife wifesHeritage
+        |> ifSelectedCalculate Wife motherHeritage
+        |> ifSelectedCalculate Wife fatherHeritage
         |> ifSelectedCalculate Son sonsHeritage
-        |> Tuple.first
 
 
-ifSelectedCalculate :
-    Heritor
-    -> (( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage ))
-    -> ( Model, ShareOfHeritage )
-    -> ( Model, ShareOfHeritage )
-ifSelectedCalculate heritor calculate ( model, availableShare ) =
+ifSelectedCalculate : Heritor -> (Model -> Model) -> Model -> Model
+ifSelectedCalculate heritor calculate model =
     case selectedHeritor heritor model.heritors of
         [] ->
-            ( model, availableShare )
+            model
 
         _ :: _ ->
-            calculate ( model, availableShare )
+            calculate model
 
 
-husbandHeritage : ( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage )
-husbandHeritage ( model, availableShare ) =
+husbandHeritage : Model -> Model
+husbandHeritage model =
     let
         share =
-            if isChildrenExist model.heritors then
+            if isAnyChildExist model.heritors then
                 oneForth
             else
                 half
 
         calculationResults =
             model.calculationResults ++ [ { heritor = Husband, share = share } ]
-
-        restOfShare =
-            Fraction.subtract availableShare share
     in
-        ( { model | calculationResults = calculationResults }, restOfShare )
+        { model | calculationResults = calculationResults }
 
 
-wifesHeritage : ( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage )
-wifesHeritage ( model, availableShare ) =
+wifesHeritage : Model -> Model
+wifesHeritage model =
     let
         share =
-            if isChildrenExist model.heritors then
+            if isAnyChildExist model.heritors then
                 oneEight
             else
                 oneForth
 
         calculationResults =
             model.calculationResults ++ [ { heritor = Wife, share = share } ]
-
-        restOfShare =
-            Fraction.subtract availableShare share
     in
-        ( { model | calculationResults = calculationResults }, restOfShare )
+        { model | calculationResults = calculationResults }
 
 
-sonsHeritage : ( Model, ShareOfHeritage ) -> ( Model, ShareOfHeritage )
-sonsHeritage ( model, availableShare ) =
+motherHeritage : Model -> Model
+motherHeritage model =
     let
+        -- Todo calculate one of two Umar cases
+        share =
+            if isAnyChildExist model.heritors || isAnySiblingExist model.heritors then
+                oneSixth
+            else
+                oneThird
+
         calculationResults =
-            model.calculationResults ++ [ { heritor = Son, share = availableShare } ]
+            model.calculationResults ++ [ { heritor = Mother, share = share } ]
     in
-        ( { model | calculationResults = calculationResults }, ( 0, 0 ) )
+        { model | calculationResults = calculationResults }
+
+
+fatherHeritage : Model -> Model
+fatherHeritage model =
+    let
+        share =
+            if isAnySonExist model.heritors then
+                oneSixth
+            else
+                restHeritage model.calculationResults
+
+        calculationResults =
+            model.calculationResults ++ [ { heritor = Father, share = share } ]
+    in
+        { model | calculationResults = calculationResults }
+
+
+sonsHeritage : Model -> Model
+sonsHeritage model =
+    let
+        restOfShare =
+            restHeritage model.calculationResults
+
+        calculationResults =
+            model.calculationResults ++ [ { heritor = Son, share = restOfShare } ]
+    in
+        { model | calculationResults = calculationResults }
+
+
+restHeritage : List HeritageCalculationResult -> Fraction
+restHeritage calculationResults =
+    let
+        calculateRest { share } restOfShare =
+            Fraction.subtract restOfShare share
+    in
+        List.foldl calculateRest whole calculationResults
 
 
 selectedHeritor : Heritor -> List HeritorState -> List HeritorState
@@ -101,13 +145,29 @@ selectedHeritor heritor heritors =
         List.filter selectedHeritor heritors
 
 
-isChildrenExist : List HeritorState -> Bool
-isChildrenExist heritors =
+isHeritorsExist : List HeritorState -> List Heritor -> Bool
+isHeritorsExist heritorStates heritors =
     let
-        sonOrDaughter state =
-            state.selected == Selected && List.member state.heritor [ Son, Daughter ]
+        isSelectedHeritorInList state =
+            state.selected == Selected && List.member state.heritor heritors
 
         children =
-            List.filter sonOrDaughter heritors
+            List.filter isSelectedHeritorInList heritorStates
     in
-        (List.length children) > 0
+        List.length children > 0
+
+
+isAnySonExist : List HeritorState -> Bool
+isAnySonExist heritors =
+    List.length (selectedHeritor Son heritors) > 0
+
+
+isAnyChildExist : List HeritorState -> Bool
+isAnyChildExist heritorStates =
+    isHeritorsExist heritorStates [ Son, Daughter ]
+
+
+isAnySiblingExist : List HeritorState -> Bool
+isAnySiblingExist heritorStates =
+    [ FullBrother, BrotherByFather, BrotherByMother, FullSister, SisterByFather, SisterByMother ]
+        |> isHeritorsExist heritorStates
